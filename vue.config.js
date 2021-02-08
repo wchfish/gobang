@@ -20,8 +20,11 @@ module.exports = {
       .path(resolve('dist'))
       .filename('[name].bundle.js')
       .globalObject('this') //https://github.com/webpack/webpack/issues/6642
-
-    config.devtool(false)
+    if (process.env.NODE_ENV === 'production') {
+      config.devtool(false)
+    } else {
+      config.devtool('eval')      
+    }
 
 
     // exclude ai.js
