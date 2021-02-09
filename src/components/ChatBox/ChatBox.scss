@@ -1,0 +1,27 @@
+.chat-box-container {
+  overflow: scroll;
+  border-top: 1px solid #f5f5f5;
+  border-bottom: 1px solid #f5f5f5;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+
+  .content-wrapper {
+    box-sizing: border-box;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+
+    .message-item {
+      box-sizing: border-box;
+      margin: 10px 0 0 20px;
+
+      animation-delay: 0.1s;
+      
+      .text {
+        border-radius: 4px;
+        padding: 5px;
+        background-color: #fff;
+      }
+    }
+  }
+}

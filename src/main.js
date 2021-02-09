@@ -6,6 +6,7 @@ import store from './store/index.js'
 
 import 'weui/dist/style/weui.min.css'
 import './reset.scss'
+import 'animate.css'
 import i18n from './i18n/index.js'
 
 Vue.config.productionTip = false

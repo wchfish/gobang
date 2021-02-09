@@ -4,6 +4,7 @@ import Board from '@/components/Board'
 import Dialog from '@/components/Dialog'
 import BigText from '@/components/BigText'
 import Popover from '@/components/Popover'
+import ChatBox from '@/components/ChatBox/ChatBox'
 
 import {
   ADD_CHESSMAN,
@@ -98,7 +99,8 @@ export default {
     Board,
     Dialog,
     BigText,
-    Popover
+    Popover,
+    ChatBox,
   },
   computed: {
     statusText () {

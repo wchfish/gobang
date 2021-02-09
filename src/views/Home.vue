@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>{{$t('title')}} {{version}}</h1>
+    <!-- <h1>{{$t('title')}} {{version}}</h1> -->
     <Board @set="set"></Board>
     <div class="status">
       <div class="status-inner"><div :class="'chessman '+(first === 1 ? 'black' : 'white')"></div> {{statusText}}</div>
@@ -38,6 +38,7 @@
           ><i class="iconfont icon-xiangyoujiantou"></i></a>
       </div>
     </div>
+    <chat-box></chat-box>
     <Dialog
       ref="offensive"
       :title="$t('dialog.chooseOffensiveTitle')"
@@ -75,7 +76,7 @@ h1 {
 }
 
 .operations {
-  margin: 2rem auto;
+  margin: 0 auto;
   padding: 0 2rem;
   max-width: 50rem;
   .weui-btn {
@@ -89,7 +90,7 @@ h1 {
 }
 
 .status {
-  margin: 1.5rem 0;
+  margin: 1.5rem 0 1rem 0;
   text-align: center;
 }
 .status-inner {
@@ -113,4 +114,21 @@ h1 {
     background-color: white;
   }
 }
+</style>
+
+<style lang="scss">
+  #app {
+    padding-bottom: 0;
+    height: calc(100vh - 51px);
+  }
+
+  .home {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-box-container {
+    flex: 1;
+  }
 </style>
