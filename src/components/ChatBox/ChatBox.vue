@@ -6,6 +6,8 @@
         :key="index"
         class="message-item animate__animated animate__fadeIn"
       >
+        <span class="name">ai</span>
+        <span class="triangle"></span>
         <span class="text">
           {{ message }}
         </span>
@@ -15,34 +17,25 @@
 </template>
 
 <script>
-import { messages as mockData } from "./mockData";
-const maxCount = mockData && mockData.length;
+import { mapState } from 'vuex';
 
 export default {
   name: "chat-box",
-  data() {
-    return {
-      messages: [],
-    };
+  computed: {
+    ...mapState({
+      messages: state => state.chat.chatItems
+    })
   },
-  mounted() {
-    this.testInterval();
-    console.log(this.$refs.contentWrapper);
+  watch:{
+    messages(val) {
+      this.setContentWrapperHeight();
+      if (val.length === 0) {
+        this.goTop()
+      }
+    }
   },
+  mounted() {},
   methods: {
-    testInterval() {
-      let index = 0;
-      const timer = setInterval(() => {
-        if (index < maxCount) {
-          this.setContentWrapperHeight();
-          
-          this.messages.push(mockData[index]);
-          index++;
-        } else {
-          clearInterval(timer);
-        }
-      }, 1000);
-    },
     setContentWrapperHeight() {
       const elem_contentWrapper = document.querySelector(".content-wrapper");
       const curWrapperHeight = elem_contentWrapper.getBoundingClientRect().height;
@@ -55,6 +48,12 @@ export default {
         elem_box.scrollTop = nextWrapperHeight - boxHeight;
       }
     },
+    goTop() {
+      const elem_box = document.querySelector(".chat-box-container");
+      const elem_contentWrapper = document.querySelector(".content-wrapper");
+      elem_contentWrapper.style.height = '0px'
+      elem_box.scrollTop = 0
+    }
   },
 };
 </script>

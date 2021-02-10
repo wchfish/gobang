@@ -16,3 +16,7 @@ export const BACKWARD = 'BACKWARD'
 export const FORWARD = 'FORWARD'
 export const SET_FIVES = 'SET_FIVES'
 export const SET_SPREAD = 'SET_SPREAD'
+
+// Chat
+export const ADD_CHAT_ITEM = 'ADD_CHAT_ITEM'
+export const CLEAR_CHAT = 'CLEAR_CHAT'

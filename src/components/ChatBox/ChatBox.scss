@@ -16,7 +16,18 @@
       margin: 10px 0 0 20px;
 
       animation-delay: 0.1s;
-      
+
+      display: flex;
+      align-items: center;
+
+      .triangle {
+        margin-left: 0;
+        width: 0;
+        height: 0;
+        border: 5px solid transparent;
+        border-right: 5px solid #fff;
+      }
+
       .text {
         border-radius: 4px;
         padding: 5px;

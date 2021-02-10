@@ -1,5 +1,5 @@
 export default {
-  greating: [
+  greeting: [
     '你好~我是轩轩~',
     'Hello~Nice to meet you~',
     '欢迎欢迎，热烈欢迎~',
@@ -59,7 +59,7 @@ export default {
     '难道本宝宝要第一次输棋了~',
     '不可能不可能~',
   ],
-  failed: [
+  lose: [
     '哎呀~感觉快输了~',
     '宝宝不开心~~',
     '这不是真的~~',

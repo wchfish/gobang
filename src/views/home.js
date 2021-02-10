@@ -1,5 +1,5 @@
 // @ is an alias to /src
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import Board from '@/components/Board'
 import Dialog from '@/components/Dialog'
 import BigText from '@/components/BigText'
@@ -15,15 +15,18 @@ import {
   FORWARD,
   BACKWARD,
   SET_FIRST,
-  SET_FIVES
+  SET_FIVES,
+  ADD_CHAT_ITEM,
+  CLEAR_CHAT,
 } from '@/store/mutations'
 import SCORE from '@/ai/score.js'
 import * as STATUS from '@/status.js'
 import win from '@/ai/win.js'
+import msg from '@/ai/messages'
 
 export default {
   name: 'home',
-  data () {
+  data() {
     return {
       bigText: '',
       score: 0,
@@ -32,8 +35,8 @@ export default {
       startTime: + new Date()
     }
   },
-  created () {
-    this.worker = new Worker("./ai.bundle.js?r="+(+new Date()));
+  created() {
+    this.worker = new Worker("./ai.bundle.js?r=" + (+new Date()));
     this.worker.onmessage = e => {
       const data = e.data
       const d = data.data
@@ -44,24 +47,58 @@ export default {
         this._set(position, 1)
         this.$store.dispatch(SET_STATUS, STATUS.PLAYING)
 
-        if (score >= SCORE.FIVE/2) {
-          if (this.lastScore < SCORE.FIVE/2) this.shouldPop = true
+        // ai对话逻辑
+        let chatMessage = ''
+        if (this.steps.length <= 2) {
+          chatMessage = msg.greeting[Math.floor(Math.random() * msg.greeting.length)]
+          console.log(chatMessage)
+        }
+        else if (this.steps.length <= 4) {
+          chatMessage = msg.opening[Math.floor(Math.random() * msg.opening.length)]
+          console.log(chatMessage)
+        }
+        else {
+          if (this.score >= 5000000) {
+            chatMessage = msg.win[Math.floor(Math.random() * msg.win.length)]
+            console.log(chatMessage)
+          }
+          else if (this.score >= 2000) {
+            chatMessage = msg.superiority[Math.floor(Math.random() * msg.superiority.length)]
+            console.log(chatMessage)
+          }
+          else if (this.score >= -2000) {
+            chatMessage = msg.balance[Math.floor(Math.random() * msg.balance.length)]
+            console.log(chatMessage)
+          }
+          else if (this.score >= -5000) {
+            chatMessage = msg.inferior[Math.floor(Math.random() * msg.inferior.length)]
+            console.log(chatMessage)
+          }
+          else if (this.score <= -5000000) {
+            chatMessage = msg.lose[Math.floor(Math.random() * msg.lose.length)]
+            console.log(chatMessage)
+          }
+        }
+        chatMessage && this.addChatItem(chatMessage)
+
+        if (score >= SCORE.FIVE / 2) {
+          if (this.lastScore < SCORE.FIVE / 2) this.shouldPop = true
           if (step <= 1) {
             this.$store.dispatch(SET_FIVES, win(this.board))
             this.$store.dispatch(SET_STATUS, STATUS.LOCKED)
             this.showBigText(this.$t('you lose'), this.end)
-          } else  if (step <= 6 && this.shouldPop) {
-            this.$refs.winPop.open()
+          } else if (step <= 6 && this.shouldPop) {
+            // this.$refs.winPop.open()
             this.shouldPop = false
           }
-        } else if (score <= - SCORE.FIVE/2) {
-          if (this.lastScore > - SCORE.FIVE/2) this.shouldPop = true
+        } else if (score <= - SCORE.FIVE / 2) {
+          if (this.lastScore > - SCORE.FIVE / 2) this.shouldPop = true
           if (step <= 1) {
             this.$store.dispatch(SET_FIVES, win(this.board))
             this.$store.dispatch(SET_STATUS, STATUS.LOCKED)
             this.showBigText(this.$t('you win'), this.end)
           } else if (step <= 6 && this.shouldPop) {
-            this.$refs.losePop.open()
+            // this.$refs.losePop.open()
             this.shouldPop = false
           }
         } else {
@@ -75,15 +112,15 @@ export default {
           this.$store.dispatch(SET_BOARD, b) // reset
           // 由于开局没有steps，因此自己创建一下
           const steps = [
-            {position: [7, 7], role: 1}
+            { position: [7, 7], role: 1 }
           ]
           let second, third
-          for (var i=0;i<b.length;i++) {
-            for (var j=0;j<b.length;j++) {
-              if (i==7&&j==7) continue
+          for (var i = 0; i < b.length; i++) {
+            for (var j = 0; j < b.length; j++) {
+              if (i == 7 && j == 7) continue
               const r = b[i][j]
-              if (r === 1) third = { position: [i,j], role: 1 }
-              if (r === 2) second = { position: [i,j], role: 2 }
+              if (r === 1) third = { position: [i, j], role: 1 }
+              if (r === 2) second = { position: [i, j], role: 2 }
             }
           }
           second && steps.push(second)
@@ -103,7 +140,7 @@ export default {
     ChatBox,
   },
   computed: {
-    statusText () {
+    statusText() {
       if (this.status === STATUS.LOADING) {
         return this.$t('status.loading')
       } else if (this.status === STATUS.READY) {
@@ -114,7 +151,7 @@ export default {
         return this.$t('status.playing', {
           score: this.score,
           step: this.step,
-          time: ((new Date() - this.startTime)/1000).toFixed(2)
+          time: ((new Date() - this.startTime) / 1000).toFixed(2)
         })
       } else return this.$t('status.loading')
     },
@@ -131,23 +168,28 @@ export default {
     })
   },
   watch: {
-    deep () {
+    deep() {
       this.updateConfig()
     },
-    spread () {
+    spread() {
       this.updateConfig()
     }
   },
   methods: {
-    showStartDialog () {
+    ...mapMutations({
+      addChatItem: ADD_CHAT_ITEM,
+      clearChat: CLEAR_CHAT,
+    }),
+    showStartDialog() {
       if (this.status !== STATUS.READY) return false
       this.$refs.offensive.open()
+      this.clearChat()
     },
-    showGiveDialog () {
+    showGiveDialog() {
       if (this.status !== STATUS.PLAYING) return false
       this.$refs.give.open()
     },
-    start (first) {
+    start(first) {
       this.$refs.offensive.close()
       this.$store.dispatch(SET_STATUS, STATUS.LOCKED)
       this.$store.dispatch(SET_FIRST, first)
@@ -158,19 +200,19 @@ export default {
           first: first === 1,
           randomOpening: this.randomOpening
         });
-      //if (first === 1 && !this.randomOpening) {
-      //  this.worker.postMessage({
-      //    type: "BEGIN"
-      //  });
-      //}
+        //if (first === 1 && !this.randomOpening) {
+        //  this.worker.postMessage({
+        //    type: "BEGIN"
+        //  });
+        //}
         this.$store.dispatch(SET_STATUS, STATUS.PLAYING)
       })
     },
-    end () {
+    end() {
       this.$store.dispatch(SET_STATUS, STATUS.READY)
     },
 
-    forward () {
+    forward() {
       if (!this.canForward()) return false
       this.$store.dispatch(FORWARD)
       this.worker.postMessage({
@@ -185,7 +227,7 @@ export default {
         type: "BACKWARD"
       });
     },
-    give () {
+    give() {
       this.$store.dispatch(SET_STATUS, STATUS.LOCKED)
       this.$refs.give.close()
       this.showBigText(this.$t('you lose'), () => {
@@ -193,7 +235,7 @@ export default {
       })
     },
 
-    showBigText (title, callback) {
+    showBigText(title, callback) {
       this.bigText = title
       this.$refs.big.open()
       setTimeout(() => {
@@ -203,21 +245,21 @@ export default {
         callback && callback.call(this)
       }, 1500)
     },
-    _set (position, role) {
+    _set(position, role) {
       this.$store.dispatch(ADD_CHESSMAN, {
         position: position,
         role: role
       })
     },
-   
-    set (position) {
+
+    set(position) {
       if (this.status !== STATUS.PLAYING) return false
       const x = position[0]
       const y = position[1]
-      if(this.board[x][y] !== 0) {
+      if (this.board[x][y] !== 0) {
         throw new Error("NOT_EMPTY")
       }
-      
+
       this._set(position, 2)
 
       this.worker.postMessage({
@@ -229,13 +271,13 @@ export default {
       this.startTime = + new Date()
     },
 
-    canBackward () {
+    canBackward() {
       return this.status === STATUS.PLAYING && this.steps.length >= 2
     },
-    canForward () {
+    canForward() {
       return this.status === STATUS.PLAYING && this.stepsTail.length >= 2
     },
-    updateConfig () {
+    updateConfig() {
       this.worker.postMessage({
         type: 'CONFIG',
         config: {

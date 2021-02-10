@@ -3,13 +3,15 @@ import Vuex from 'vuex'
 
 import home from './modules/home.js'
 import board from './modules/board.js'
+import chat from './modules/chat.js'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   modules: {
     home,
-    board
+    board,
+    chat
   },
   state: {
     version: "V3.0.0-beta.3"
